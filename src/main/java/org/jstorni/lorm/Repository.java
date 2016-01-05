@@ -17,4 +17,5 @@ public interface Repository<T> {
 	
 	void deleteById(List<String> ids);
 	
+	Class<T> getEntityClass();
 }

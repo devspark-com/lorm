@@ -71,4 +71,8 @@ public class DummyRepository<T> implements Repository<T> {
 		}
 	}
 	
+	@Override
+	public Class<T> getEntityClass() {
+		return entityClass;
+	}
 }
