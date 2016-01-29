@@ -12,6 +12,7 @@ import org.devspark.aws.lorm.schema.AttributeDefinition;
 import org.devspark.aws.lorm.schema.AttributeType;
 import org.devspark.aws.lorm.test.model.Category;
 import org.devspark.aws.lorm.test.model.Expense;
+import org.devspark.aws.lorm.test.model.ExpenseType;
 import org.devspark.aws.lorm.test.model.Merchant;
 import org.devspark.aws.lorm.test.model.Reporter;
 import org.devspark.aws.lorm.test.model.embedded.SampleEntity;
@@ -56,6 +57,8 @@ public class ItemToEntityMapperImplTest {
 				AttributeType.STRING, null), "attachment location");
 		attributes.put(new AttributeDefinition("attachment.description",
 				AttributeType.STRING, null), "attachment description");
+		attributes.put(new AttributeDefinition("expenseType",
+				AttributeType.STRING, null), "REIMBURSABLE");
 
 		ItemToEntityMapperImpl<Expense> expenseMapper = new ItemToEntityMapperImpl<Expense>(
 				Expense.class, DummyEntityManager.get());
@@ -71,7 +74,7 @@ public class ItemToEntityMapperImplTest {
 				.getLocation());
 		Assert.assertEquals("attachment description", expense.getAttachment()
 				.getDescription());
-
+		Assert.assertEquals(ExpenseType.REIMBURSABLE, expense.getExpenseType());
 	}
 
 	@Test

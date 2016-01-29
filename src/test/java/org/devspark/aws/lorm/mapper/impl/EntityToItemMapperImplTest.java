@@ -92,6 +92,9 @@ public class EntityToItemMapperImplTest {
 		attributes.add(new org.devspark.aws.lorm.schema.AttributeDefinition(
 				"attachment.description", AttributeType.STRING, null));
 
+		attributes.add(new org.devspark.aws.lorm.schema.AttributeDefinition(
+				"expenseType", AttributeType.STRING, null));
+		
 		EntityToItemMapperImpl<Expense> mapper = new EntityToItemMapperImpl<Expense>(
 				Expense.class);
 
@@ -124,13 +127,14 @@ public class EntityToItemMapperImplTest {
 		List<SchemaValidationError> negativeCaseValidationErrors = mapper
 				.validateSchema(new EntitySchema("expense", attributes));
 		Assert.assertFalse(negativeCaseValidationErrors.isEmpty());
-		Assert.assertEquals(4, negativeCaseValidationErrors.size());
+		Assert.assertEquals(5, negativeCaseValidationErrors.size());
 
 		for (SchemaValidationError error : negativeCaseValidationErrors) {
 			String attrName = error.getAttributeDefinition().getName();
 			Assert.assertTrue(attrName.equals("reporter.id")
 					|| attrName.equals("amount") || attrName.equals("date")
-					|| attrName.equals("attachment.location"));
+					|| attrName.equals("attachment.location")
+					|| attrName.equals("expenseType"));
 		}
 
 		List<AttributeDefinition> negativeMissingFieldsInEntityClass = mapper
@@ -141,13 +145,14 @@ public class EntityToItemMapperImplTest {
 		List<AttributeDefinition> negativeFieldsInTable = mapper
 				.getMissingFieldsInTable(new EntitySchema("expense", attributes));
 		Assert.assertFalse(negativeFieldsInTable.isEmpty());
-		Assert.assertEquals(4, negativeFieldsInTable.size());
+		Assert.assertEquals(5, negativeFieldsInTable.size());
 
 		for (AttributeDefinition attrDef : negativeFieldsInTable) {
 			Assert.assertTrue(attrDef.getName().equals("reporter.id")
 					|| attrDef.getName().equals("amount")
 					|| attrDef.getName().equals("date")
-					|| attrDef.getName().equals("attachment.location"));
+					|| attrDef.getName().equals("attachment.location")
+					|| attrDef.getName().equals("expenseType"));
 		}
 
 	}

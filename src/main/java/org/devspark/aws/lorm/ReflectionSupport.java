@@ -55,7 +55,12 @@ public class ReflectionSupport {
 				field.setAccessible(true);
 			}
 
-			field.set(instance, value);
+			if (field.getType().isEnum()) {
+				field.set(instance, null);
+			} else {
+				field.set(instance, value);	
+			}
+			
 		} catch (Exception ex) {
 			throw new DataException("Error while assigning value [" + value
 					+ "] to field [" + field.getName() + "] and class ["

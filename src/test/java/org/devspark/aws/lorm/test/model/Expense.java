@@ -37,6 +37,9 @@ public class Expense extends BaseEntity {
 	@Embedded
 	private Attachment attachment;
 
+	@NotNull
+	private ExpenseType expenseType;
+
 	public Category getCategory() {
 		return category;
 	}
@@ -91,6 +94,14 @@ public class Expense extends BaseEntity {
 
 	public void setAttachment(Attachment attachment) {
 		this.attachment = attachment;
+	}
+
+	public ExpenseType getExpenseType() {
+		return expenseType;
+	}
+
+	public void setExpenseType(ExpenseType expenseType) {
+		this.expenseType = expenseType;
 	}
 
 }

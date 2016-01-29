@@ -41,16 +41,18 @@ public class DefaultEntityToItemMappingStrategy implements
 
 		List<AttributeDefinition> attrs = new ArrayList<AttributeDefinition>();
 		attrs.add(buildAttributeDefinition(field, fieldNamePrefix));
-		
+
 		return attrs;
 	}
 
-	protected AttributeDefinition buildAttributeDefinition(Field field, String fieldNamePrefix) {
+	protected AttributeDefinition buildAttributeDefinition(Field field,
+			String fieldNamePrefix) {
 		String attrName = fieldNamePrefix + field.getName();
 		AttributeType attrType;
 		if (field.getType().equals(Boolean.class)) {
 			attrType = AttributeType.BOOLEAN;
-		} else if (field.getType().equals(String.class)) {
+		} else if (field.getType().equals(String.class)
+				|| field.getType().isEnum()) {
 			attrType = AttributeType.STRING;
 		} else if (Number.class.isAssignableFrom(field.getType())) {
 			attrType = AttributeType.NUMBER;
@@ -73,8 +75,8 @@ public class DefaultEntityToItemMappingStrategy implements
 
 	protected boolean needsUpdate(EntitySchema entitySchema,
 			Class<?> entityClass, Field field, String fieldNamePrefix) {
-		List<SchemaValidationError> validationErrors = hasValidSchema(entitySchema,
-				entityClass, field, fieldNamePrefix);
+		List<SchemaValidationError> validationErrors = hasValidSchema(
+				entitySchema, entityClass, field, fieldNamePrefix);
 
 		if (validationErrors == null || validationErrors.isEmpty()) {
 			return false; // nothing to do
@@ -83,8 +85,9 @@ public class DefaultEntityToItemMappingStrategy implements
 		for (SchemaValidationError schemaValidationError : validationErrors) {
 			if (schemaValidationError.getErrorType().equals(
 					SchemaValidationErrorType.WRONG_TYPE)) {
-				throw new DataValidationException("Attribute " + field.getName()
-						+ " already exists in table " + entitySchema.getName()
+				throw new DataValidationException("Attribute "
+						+ field.getName() + " already exists in table "
+						+ entitySchema.getName()
 						+ " but with different data type. Details: "
 						+ schemaValidationError.getMessage());
 			} else if (schemaValidationError.getErrorType().equals(
@@ -101,10 +104,12 @@ public class DefaultEntityToItemMappingStrategy implements
 	}
 
 	@Override
-	public List<SchemaValidationError> hasValidSchema(EntitySchema entitySchema,
-			Class<?> entityClass, Field field, String fieldNamePrefix) {
+	public List<SchemaValidationError> hasValidSchema(
+			EntitySchema entitySchema, Class<?> entityClass, Field field,
+			String fieldNamePrefix) {
 
-		AttributeDefinition attrDef = buildAttributeDefinition(field, fieldNamePrefix);
+		AttributeDefinition attrDef = buildAttributeDefinition(field,
+				fieldNamePrefix);
 
 		List<SchemaValidationError> errors = new ArrayList<SchemaValidationError>();
 		if (entitySchema == null) {
@@ -137,9 +142,9 @@ public class DefaultEntityToItemMappingStrategy implements
 		}
 
 		if (error != null) {
-			errors.add(error);	
+			errors.add(error);
 		}
-		
+
 		return errors;
 	}
 
@@ -148,7 +153,7 @@ public class DefaultEntityToItemMappingStrategy implements
 		if (attrType.equals(AttributeType.BOOLEAN)) {
 			valid = field.getType().equals(Boolean.class);
 		} else if (attrType.equals(AttributeType.STRING)) {
-			valid = field.getType().equals(String.class);
+			valid = field.getType().equals(String.class) || field.getType().isEnum();
 		} else if (attrType.equals(AttributeType.NUMBER)) {
 			valid = Number.class.isAssignableFrom(field.getType());
 		} else {
@@ -174,7 +179,8 @@ public class DefaultEntityToItemMappingStrategy implements
 	public List<EntityFieldAsAttribute> getEntityFieldAsAttribute(Field field,
 			String fieldNamePrefix) {
 		List<EntityFieldAsAttribute> attrs = new ArrayList<EntityFieldAsAttribute>();
-		attrs.add(new EntityFieldAsAttribute(field.getType(), fieldNamePrefix + field.getName()));
+		attrs.add(new EntityFieldAsAttribute(field.getType(), fieldNamePrefix
+				+ field.getName()));
 
 		return attrs;
 	}
