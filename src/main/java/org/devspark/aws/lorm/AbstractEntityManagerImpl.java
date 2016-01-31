@@ -10,36 +10,33 @@ import org.devspark.aws.lorm.schema.validation.EntitySchemaSupport;
 
 public abstract class AbstractEntityManagerImpl implements EntityManager {
 
-	private final Map<Class<?>, Repository<?>> repositories;
+    private final Map<Class<?>, Repository<?>> repositories;
 
-	public AbstractEntityManagerImpl() {
-		repositories = Collections
-				.synchronizedMap(new HashMap<Class<?>, Repository<?>>());
-	}
+    public AbstractEntityManagerImpl() {
+	repositories = Collections.synchronizedMap(new HashMap<Class<?>, Repository<?>>());
+    }
 
-	public AbstractEntityManagerImpl(Map<String, String> properties) {
-		this();
-		setUp(properties);
-	}
+    public AbstractEntityManagerImpl(Map<String, String> properties) {
+	this();
+	setUp(properties);
+    }
 
-	protected void setUp(Map<String, String> properties) {
+    protected void setUp(Map<String, String> properties) {
 
-	}
+    }
 
-	protected Map<Class<?>, Repository<?>> getAllRepositories() {
-		return repositories;
-	}
+    protected Map<Class<?>, Repository<?>> getAllRepositories() {
+	return repositories;
+    }
 
-	@Override
-	public abstract <T> void addEntity(Class<T> entityClass,
-			EntityToItemMapper entityToItemMapper,
-			ItemToEntityMapper<T> itemToEntityMapper,
-			EntitySchemaSupport entitySchemaSupport);
+    @Override
+    public abstract <T> void addEntity(Class<T> entityClass, EntityToItemMapper entityToItemMapper,
+	    ItemToEntityMapper<T> itemToEntityMapper, EntitySchemaSupport entitySchemaSupport);
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> Repository<T> getRepository(Class<T> entityClass) {
-		return (Repository<T>) repositories.get(entityClass);
-	}
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> Repository<T> getRepository(Class<T> entityClass) {
+	return (Repository<T>) repositories.get(entityClass);
+    }
 
 }

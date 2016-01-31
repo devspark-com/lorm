@@ -5,24 +5,24 @@ import javax.persistence.Embedded;
 
 @Embeddable
 public class SampleEmbeddable {
-	private String someField;
+    private String someField;
 
-	@Embedded
-	private SampleEmbeddable deepEmbedded;
+    @Embedded
+    private SampleEmbeddable deepEmbedded;
 
-	public String getSomeField() {
-		return someField;
-	}
+    public String getSomeField() {
+	return someField;
+    }
 
-	public void setSomeField(String someField) {
-		this.someField = someField;
-	}
+    public void setSomeField(String someField) {
+	this.someField = someField;
+    }
 
-	public SampleEmbeddable getDeepEmbedded() {
-		return deepEmbedded;
-	}
+    public SampleEmbeddable getDeepEmbedded() {
+	return deepEmbedded;
+    }
 
-	public void setDeepEmbedded(SampleEmbeddable deepEmbedded) {
-		this.deepEmbedded = deepEmbedded;
-	}
+    public void setDeepEmbedded(SampleEmbeddable deepEmbedded) {
+	this.deepEmbedded = deepEmbedded;
+    }
 }

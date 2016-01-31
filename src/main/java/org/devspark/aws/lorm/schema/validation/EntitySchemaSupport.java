@@ -7,15 +7,14 @@ import org.devspark.aws.lorm.schema.EntitySchema;
 
 public interface EntitySchemaSupport {
 
-	List<SchemaValidationError> validateSchema(EntitySchema entitySchema);
+    List<SchemaValidationError> validateSchema(EntitySchema entitySchema);
 
-	List<AttributeDefinition> getMissingFieldsInTable(EntitySchema entitySchema);
+    List<AttributeDefinition> getMissingFieldsInTable(EntitySchema entitySchema);
 
-	List<AttributeDefinition> getMissingAttributesInEntityClass(
-			EntitySchema entitySchema);
+    List<AttributeDefinition> getMissingAttributesInEntityClass(EntitySchema entitySchema);
 
-	// TODO get missing indexes in entity
+    // TODO get missing indexes in entity
 
-	// TODO get missing indexes in table
+    // TODO get missing indexes in table
 
 }

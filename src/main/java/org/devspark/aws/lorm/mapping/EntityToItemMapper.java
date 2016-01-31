@@ -6,6 +6,6 @@ import org.devspark.aws.lorm.schema.AttributeDefinition;
 
 public interface EntityToItemMapper {
 
-	Map<AttributeDefinition, Object> map(Object entity);
+    Map<AttributeDefinition, Object> map(Object entity);
 
 }

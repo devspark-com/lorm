@@ -12,42 +12,36 @@ import org.devspark.aws.lorm.schema.EntitySchema;
 import org.devspark.aws.lorm.schema.validation.EntityFieldAsAttribute;
 import org.devspark.aws.lorm.schema.validation.SchemaValidationError;
 
-public class OneToManyEntityMappingStrategy implements
-		EntityToItemMappingStrategy {
+public class OneToManyEntityMappingStrategy implements EntityToItemMappingStrategy {
 
-	@Override
-	public List<SchemaValidationError> hasValidSchema(
-			EntitySchema entitySchema, Class<?> entityClass, Field field,
-			String fieldNamePrefix) {
-		throw new DataValidationException(
-				"OneToMany annotation is not supported");
-	}
+    @Override
+    public List<SchemaValidationError> hasValidSchema(EntitySchema entitySchema,
+	    Class<?> entityClass, Field field, String fieldNamePrefix) {
+	throw new DataValidationException("OneToMany annotation is not supported");
+    }
 
-	@Override
-	public List<AttributeDefinition> getSchemaUpdate(EntitySchema entitySchema,
-			Class<?> entityClass, Field field, String fieldNamePrefix) {
-		throw new DataValidationException(
-				"OneToMany annotation is not supported");
-	}
+    @Override
+    public List<AttributeDefinition> getSchemaUpdate(EntitySchema entitySchema,
+	    Class<?> entityClass, Field field, String fieldNamePrefix) {
+	throw new DataValidationException("OneToMany annotation is not supported");
+    }
 
-	@Override
-	public List<EntityFieldAsAttribute> getEntityFieldAsAttribute(Field field,
-			String fieldNamePrefix) {
-		throw new DataValidationException(
-				"OneToMany annotation is not supported");
-	}
+    @Override
+    public List<EntityFieldAsAttribute> getEntityFieldAsAttribute(Field field,
+	    String fieldNamePrefix) {
+	throw new DataValidationException("OneToMany annotation is not supported");
+    }
 
-	@Override
-	public boolean apply(Field field) {
-		return field.getAnnotation(OneToMany.class) != null;
-	}
+    @Override
+    public boolean apply(Field field) {
+	return field.getAnnotation(OneToMany.class) != null;
+    }
 
-	@Override
-	public void map(Object entity, Field field, String fieldNamePrefix,
-			Map<AttributeDefinition, Object> attributes) {
-		throw new DataValidationException(
-				"OneToMany annotation is not supported");
+    @Override
+    public void map(Object entity, Field field, String fieldNamePrefix,
+	    Map<AttributeDefinition, Object> attributes) {
+	throw new DataValidationException("OneToMany annotation is not supported");
 
-	}
+    }
 
 }
