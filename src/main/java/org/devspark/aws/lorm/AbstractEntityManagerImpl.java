@@ -13,7 +13,8 @@ public abstract class AbstractEntityManagerImpl implements EntityManager {
     private final Map<Class<?>, Repository<?>> repositories;
 
     public AbstractEntityManagerImpl() {
-	repositories = Collections.synchronizedMap(new HashMap<Class<?>, Repository<?>>());
+	repositories = Collections
+		.synchronizedMap(new HashMap<Class<?>, Repository<?>>());
     }
 
     public AbstractEntityManagerImpl(Map<String, String> properties) {
@@ -30,8 +31,10 @@ public abstract class AbstractEntityManagerImpl implements EntityManager {
     }
 
     @Override
-    public abstract <T> void addEntity(Class<T> entityClass, EntityToItemMapper entityToItemMapper,
-	    ItemToEntityMapper<T> itemToEntityMapper, EntitySchemaSupport entitySchemaSupport);
+    public abstract <T> void addEntity(Class<T> entityClass,
+	    EntityToItemMapper entityToItemMapper,
+	    ItemToEntityMapper<T> itemToEntityMapper,
+	    EntitySchemaSupport entitySchemaSupport);
 
     @SuppressWarnings("unchecked")
     @Override

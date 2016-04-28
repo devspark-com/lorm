@@ -41,16 +41,18 @@ public class ManyToOneItemToEntityMappingStrategy implements ItemToEntityMapping
 	String fieldKey = itemEntry.getKey().getName();
 
 	if (!itemEntry.getValue().getClass().equals(String.class)) {
-	    throw new DataValidationException("Invalid ID type ("
-		    + itemEntry.getValue().getClass().getName() + ") for entity ("
-		    + entityInstance.getClass().getName() + ") - Item component: " + fieldKey);
+	    throw new DataValidationException(
+		    "Invalid ID type (" + itemEntry.getValue().getClass().getName()
+			    + ") for entity (" + entityInstance.getClass().getName()
+			    + ") - Item component: " + fieldKey);
 	}
 
 	if (fieldKey.contains(".")) {
 	    fieldKey = fieldKey.substring(0, fieldKey.indexOf('.'));
 	} else {
-	    throw new DataValidationException("Invalid ManyToOne attribute name: " + fieldKey
-		    + " for entity class: " + entityInstance.getClass().getName());
+	    throw new DataValidationException("Invalid ManyToOne attribute name: "
+		    + fieldKey + " for entity class: "
+		    + entityInstance.getClass().getName());
 	}
 
 	String refId = (String) itemEntry.getValue();

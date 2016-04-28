@@ -17,8 +17,8 @@ public class DataValidationException extends DataException {
 	super(message, cause);
     }
 
-    public DataValidationException(String message, Throwable cause, boolean enableSuppression,
-	    boolean writableStackTrace) {
+    public DataValidationException(String message, Throwable cause,
+	    boolean enableSuppression, boolean writableStackTrace) {
 	super(message, cause, enableSuppression, writableStackTrace);
     }
 

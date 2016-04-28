@@ -11,7 +11,8 @@ public interface EntitySchemaSupport {
 
     List<AttributeDefinition> getMissingFieldsInTable(EntitySchema entitySchema);
 
-    List<AttributeDefinition> getMissingAttributesInEntityClass(EntitySchema entitySchema);
+    List<AttributeDefinition> getMissingAttributesInEntityClass(
+	    EntitySchema entitySchema);
 
     // TODO get missing indexes in entity
 

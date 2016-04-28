@@ -26,10 +26,11 @@ public class DateEntityToItemMappingStrategy extends DefaultEntityToItemMappingS
     }
 
     @Override
-    protected AttributeDefinition buildAttributeDefinition(Field field, String fieldNamePrefix) {
+    protected AttributeDefinition buildAttributeDefinition(Field field,
+	    String fieldNamePrefix) {
 	// TODO get constraints
-	return new AttributeDefinition(fieldNamePrefix + field.getName(), AttributeType.NUMBER,
-		null);
+	return new AttributeDefinition(fieldNamePrefix + field.getName(),
+		AttributeType.NUMBER, null);
     }
 
     @Override
@@ -47,9 +48,9 @@ public class DateEntityToItemMappingStrategy extends DefaultEntityToItemMappingS
 	if (field.getType().equals(Date.class)) {
 	    attributes.put(attrDef, ((Date) value).getTime());
 	} else {
-	    throw new DataValidationException(
-		    "Incompatible field type (" + field.getName() + "). " + "Expected: "
-			    + Date.class.getName() + ". Actual: " + value.getClass().getName());
+	    throw new DataValidationException("Incompatible field type ("
+		    + field.getName() + "). " + "Expected: " + Date.class.getName()
+		    + ". Actual: " + value.getClass().getName());
 	}
 
     }

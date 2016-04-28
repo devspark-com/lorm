@@ -20,45 +20,47 @@ public class SchemaValidationError {
 	this.validationScope = validationScope;
     }
 
-    public static SchemaValidationError buildTableError(String tableName, String message) {
+    public static SchemaValidationError buildTableError(String tableName,
+	    String message) {
 	return new SchemaValidationError(null, SchemaValidationErrorType.GENERAL,
 		SchemaValidationScope.TABLE, tableName, message);
     }
 
-    public static SchemaValidationError buildGeneralError(AttributeDefinition attributeDefinition,
-	    String message) {
-	return new SchemaValidationError(attributeDefinition, SchemaValidationErrorType.GENERAL,
-		SchemaValidationScope.ATTRIBUTE, attributeDefinition.getName(), message);
+    public static SchemaValidationError buildGeneralError(
+	    AttributeDefinition attributeDefinition, String message) {
+	return new SchemaValidationError(attributeDefinition,
+		SchemaValidationErrorType.GENERAL, SchemaValidationScope.ATTRIBUTE,
+		attributeDefinition.getName(), message);
     }
 
     public static SchemaValidationError buildMissingFieldError(
 	    AttributeDefinition attributeDefinition) {
 	String message = "Missing attribute in table: " + attributeDefinition.getName();
 	return new SchemaValidationError(attributeDefinition,
-		SchemaValidationErrorType.MISSING_IN_TABLE, SchemaValidationScope.ATTRIBUTE,
-		attributeDefinition.getName(), message);
+		SchemaValidationErrorType.MISSING_IN_TABLE,
+		SchemaValidationScope.ATTRIBUTE, attributeDefinition.getName(), message);
     }
 
     public static SchemaValidationError buildWrongFieldTypeError(
 	    AttributeDefinition attributeDefinition, String message) {
 	return new SchemaValidationError(attributeDefinition,
-		SchemaValidationErrorType.MISSING_IN_TABLE, SchemaValidationScope.ATTRIBUTE,
-		attributeDefinition.getName(), message);
+		SchemaValidationErrorType.MISSING_IN_TABLE,
+		SchemaValidationScope.ATTRIBUTE, attributeDefinition.getName(), message);
     }
 
     public static SchemaValidationError buildMissingAttributeError(
 	    AttributeDefinition attributeDefinition) {
 	String message = "Missing attribute in entity: " + attributeDefinition.getName();
 	return new SchemaValidationError(attributeDefinition,
-		SchemaValidationErrorType.MISSING_IN_ENTITY, SchemaValidationScope.ATTRIBUTE,
-		attributeDefinition.getName(), message);
+		SchemaValidationErrorType.MISSING_IN_ENTITY,
+		SchemaValidationScope.ATTRIBUTE, attributeDefinition.getName(), message);
     }
 
     public static SchemaValidationError buildNotNeededFieldError(
 	    AttributeDefinition attributeDefinition, String message) {
 	return new SchemaValidationError(attributeDefinition,
-		SchemaValidationErrorType.MISSING_IN_ENTITY, SchemaValidationScope.ATTRIBUTE,
-		attributeDefinition.getName(), message);
+		SchemaValidationErrorType.MISSING_IN_ENTITY,
+		SchemaValidationScope.ATTRIBUTE, attributeDefinition.getName(), message);
     }
 
     public static SchemaValidationError buildRecursiveError(Class<?> entityClass,

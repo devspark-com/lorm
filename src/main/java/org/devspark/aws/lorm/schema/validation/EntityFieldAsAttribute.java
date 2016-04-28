@@ -23,7 +23,8 @@ public class EntityFieldAsAttribute {
     public int hashCode() {
 	final int prime = 31;
 	int result = 1;
-	result = prime * result + ((attributeName == null) ? 0 : attributeName.hashCode());
+	result = prime * result
+		+ ((attributeName == null) ? 0 : attributeName.hashCode());
 	result = prime * result + ((type == null) ? 0 : type.hashCode());
 	return result;
     }

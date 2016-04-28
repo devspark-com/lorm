@@ -35,9 +35,9 @@ public class DateItemToEntityMappingStrategy implements ItemToEntityMappingStrat
 		    new Date(((Number) value).longValue()));
 
 	} else {
-	    throw new DataValidationException(
-		    "Incompatible item attribute (" + field.getName() + "). " + "Expected: "
-			    + Number.class.getName() + ". Actual: " + value.getClass().getName());
+	    throw new DataValidationException("Incompatible item attribute ("
+		    + field.getName() + "). " + "Expected: " + Number.class.getName()
+		    + ". Actual: " + value.getClass().getName());
 	}
 
     }

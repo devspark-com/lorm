@@ -43,7 +43,8 @@ public class DefaultEntityToItemMappingStrategy implements EntityToItemMappingSt
 	return attrs;
     }
 
-    protected AttributeDefinition buildAttributeDefinition(Field field, String fieldNamePrefix) {
+    protected AttributeDefinition buildAttributeDefinition(Field field,
+	    String fieldNamePrefix) {
 	String attrName = fieldNamePrefix + field.getName();
 	AttributeType attrType;
 	if (field.getType().equals(Boolean.class)) {
@@ -60,24 +61,26 @@ public class DefaultEntityToItemMappingStrategy implements EntityToItemMappingSt
 	// TODO support constraints
 	Set<AttributeConstraint> constraints = new HashSet<AttributeConstraint>();
 	if (field.getAnnotation(Id.class) != null) {
-	    constraints.add(new AttributeConstraint(AttributeConstraintType.PRIMARY_KEY, null));
+	    constraints.add(
+		    new AttributeConstraint(AttributeConstraintType.PRIMARY_KEY, null));
 	}
 
 	return new AttributeDefinition(attrName, attrType, constraints);
 
     }
 
-    protected boolean needsUpdate(EntitySchema entitySchema, Class<?> entityClass, Field field,
-	    String fieldNamePrefix) {
-	List<SchemaValidationError> validationErrors = hasValidSchema(entitySchema, entityClass,
-		field, fieldNamePrefix);
+    protected boolean needsUpdate(EntitySchema entitySchema, Class<?> entityClass,
+	    Field field, String fieldNamePrefix) {
+	List<SchemaValidationError> validationErrors = hasValidSchema(entitySchema,
+		entityClass, field, fieldNamePrefix);
 
 	if (validationErrors == null || validationErrors.isEmpty()) {
 	    return false; // nothing to do
 	}
 
 	for (SchemaValidationError schemaValidationError : validationErrors) {
-	    if (schemaValidationError.getErrorType().equals(SchemaValidationErrorType.WRONG_TYPE)) {
+	    if (schemaValidationError.getErrorType()
+		    .equals(SchemaValidationErrorType.WRONG_TYPE)) {
 		throw new DataValidationException("Attribute " + field.getName()
 			+ " already exists in table " + entitySchema.getName()
 			+ " but with different data type. Details: "
@@ -118,8 +121,8 @@ public class DefaultEntityToItemMappingStrategy implements EntityToItemMappingSt
 		    String message = "Invalid attribute type. Field data type: "
 			    + field.getType().getName() + " .Schema data type: "
 			    + attributeDefinition.getType();
-		    error = SchemaValidationError.buildWrongFieldTypeError(attributeDefinition,
-			    message);
+		    error = SchemaValidationError
+			    .buildWrongFieldTypeError(attributeDefinition, message);
 		}
 		found = true;
 		break;
@@ -168,7 +171,8 @@ public class DefaultEntityToItemMappingStrategy implements EntityToItemMappingSt
     public List<EntityFieldAsAttribute> getEntityFieldAsAttribute(Field field,
 	    String fieldNamePrefix) {
 	List<EntityFieldAsAttribute> attrs = new ArrayList<EntityFieldAsAttribute>();
-	attrs.add(new EntityFieldAsAttribute(field.getType(), fieldNamePrefix + field.getName()));
+	attrs.add(new EntityFieldAsAttribute(field.getType(),
+		fieldNamePrefix + field.getName()));
 
 	return attrs;
     }

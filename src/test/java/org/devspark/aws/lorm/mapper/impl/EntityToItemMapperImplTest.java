@@ -1,5 +1,7 @@
 package org.devspark.aws.lorm.mapper.impl;
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -13,8 +15,11 @@ import org.devspark.aws.lorm.schema.EntitySchema;
 import org.devspark.aws.lorm.schema.validation.SchemaValidationError;
 import org.devspark.aws.lorm.schema.validation.SchemaValidationErrorType;
 import org.devspark.aws.lorm.schema.validation.SchemaValidationScope;
+import org.devspark.aws.lorm.test.model.Category;
 import org.devspark.aws.lorm.test.model.Expense;
+import org.devspark.aws.lorm.test.model.ExpenseType;
 import org.devspark.aws.lorm.test.model.Merchant;
+import org.devspark.aws.lorm.test.model.Reporter;
 import org.devspark.aws.lorm.test.model.embedded.SampleEmbeddable;
 import org.devspark.aws.lorm.test.model.embedded.SampleEntity;
 import org.junit.Assert;
@@ -43,7 +48,16 @@ public class EntityToItemMapperImplTest {
 
     @Test
     public void testManyToOneMap() {
-	EntityToItemMapperImpl<Expense> mapper = new EntityToItemMapperImpl<Expense>(Expense.class);
+	EntityToItemMapperImpl<Expense> mapper = new EntityToItemMapperImpl<Expense>(
+		Expense.class);
+
+	Reporter reporter = new Reporter();
+	reporter.setId("reporterid");
+	reporter.setName("reportername");
+
+	Category category = new Category();
+	category.setId("categoryid");
+	category.setDescription("categorydescription");
 
 	Merchant merchant = new Merchant();
 	merchant.setId("merchantid");
@@ -53,12 +67,24 @@ public class EntityToItemMapperImplTest {
 	expense.setId("expenseid");
 	expense.setDescription("expensedescription");
 	expense.setMerchant(merchant);
+	expense.setCategory(category);
+	expense.setReporter(reporter);
+	expense.setAmount(new BigDecimal(10));
+	long now = System.currentTimeMillis();
+	expense.setDate(new Date(now));
+	expense.setExpenseType(ExpenseType.REIMBURSABLE);
 
 	Map<AttributeDefinition, Object> attrs = mapper.map(expense);
 	Assert.assertEquals("expenseid", attrs.get(buildAttrDefByName("id")));
-	Assert.assertEquals("expensedescription", attrs.get(buildAttrDefByName("description")));
+	Assert.assertEquals("expensedescription",
+		attrs.get(buildAttrDefByName("description")));
 	Assert.assertEquals("merchantid", attrs.get(buildAttrDefByName("merchant.id")));
-
+	Assert.assertEquals("categoryid", attrs.get(buildAttrDefByName("category.id")));
+	Assert.assertEquals("reporterid", attrs.get(buildAttrDefByName("reporter.id")));
+	Assert.assertEquals(new BigDecimal(10), attrs.get(buildAttrDefByName("amount")));
+	Assert.assertEquals(now, attrs.get(buildAttrDefByName("date")));
+	Assert.assertEquals(ExpenseType.REIMBURSABLE,
+		attrs.get(buildAttrDefByName("expenseType")));
     }
 
     @Test
@@ -83,8 +109,8 @@ public class EntityToItemMapperImplTest {
 	attributes.add(new org.devspark.aws.lorm.schema.AttributeDefinition("reporter.id",
 		AttributeType.STRING, null));
 
-	attributes.add(new org.devspark.aws.lorm.schema.AttributeDefinition("attachment.location",
-		AttributeType.STRING, null));
+	attributes.add(new org.devspark.aws.lorm.schema.AttributeDefinition(
+		"attachment.location", AttributeType.STRING, null));
 
 	attributes.add(new org.devspark.aws.lorm.schema.AttributeDefinition(
 		"attachment.description", AttributeType.STRING, null));
@@ -92,18 +118,21 @@ public class EntityToItemMapperImplTest {
 	attributes.add(new org.devspark.aws.lorm.schema.AttributeDefinition("expenseType",
 		AttributeType.STRING, null));
 
-	EntityToItemMapperImpl<Expense> mapper = new EntityToItemMapperImpl<Expense>(Expense.class);
+	EntityToItemMapperImpl<Expense> mapper = new EntityToItemMapperImpl<Expense>(
+		Expense.class);
 
 	List<SchemaValidationError> positiveCaseValidationErrors = mapper
 		.validateSchema(new EntitySchema("expense", attributes));
 	Assert.assertTrue(positiveCaseValidationErrors.isEmpty());
 
 	List<AttributeDefinition> missingFieldsInEntityClass = mapper
-		.getMissingAttributesInEntityClass(new EntitySchema("expense", attributes));
+		.getMissingAttributesInEntityClass(
+			new EntitySchema("expense", attributes));
 	Assert.assertTrue(missingFieldsInEntityClass.isEmpty());
 
 	List<AttributeDefinition> missingFieldsInTable = mapper
-		.getMissingAttributesInEntityClass(new EntitySchema("expense", attributes));
+		.getMissingAttributesInEntityClass(
+			new EntitySchema("expense", attributes));
 	Assert.assertTrue(missingFieldsInTable.isEmpty());
 
 	attributes.clear();
@@ -131,7 +160,8 @@ public class EntityToItemMapperImplTest {
 	}
 
 	List<AttributeDefinition> negativeMissingFieldsInEntityClass = mapper
-		.getMissingAttributesInEntityClass(new EntitySchema("expense", attributes));
+		.getMissingAttributesInEntityClass(
+			new EntitySchema("expense", attributes));
 	Assert.assertTrue(negativeMissingFieldsInEntityClass.isEmpty());
 
 	List<AttributeDefinition> negativeFieldsInTable = mapper
@@ -141,7 +171,8 @@ public class EntityToItemMapperImplTest {
 
 	for (AttributeDefinition attrDef : negativeFieldsInTable) {
 	    Assert.assertTrue(attrDef.getName().equals("reporter.id")
-		    || attrDef.getName().equals("amount") || attrDef.getName().equals("date")
+		    || attrDef.getName().equals("amount")
+		    || attrDef.getName().equals("date")
 		    || attrDef.getName().equals("attachment.location")
 		    || attrDef.getName().equals("expenseType"));
 	}
@@ -161,8 +192,8 @@ public class EntityToItemMapperImplTest {
 
 	String attrName = "embedded";
 	for (int i = 5; i > 0; i--) {
-	    AttributeDefinition expectedAttr = new AttributeDefinition(attrName + ".someField",
-		    AttributeType.STRING, null);
+	    AttributeDefinition expectedAttr = new AttributeDefinition(
+		    attrName + ".someField", AttributeType.STRING, null);
 	    Assert.assertTrue(attrs.containsKey(expectedAttr));
 	    Assert.assertEquals("some field " + i, attrs.get(expectedAttr));
 
@@ -179,12 +210,12 @@ public class EntityToItemMapperImplTest {
 
 	attributes.add(new org.devspark.aws.lorm.schema.AttributeDefinition("id",
 		AttributeType.STRING, constraints));
-	attributes.add(new org.devspark.aws.lorm.schema.AttributeDefinition("someRandomField",
-		AttributeType.STRING, null));
-	attributes.add(new org.devspark.aws.lorm.schema.AttributeDefinition("embedded.someField",
-		AttributeType.STRING, null));
-	attributes.add(new org.devspark.aws.lorm.schema.AttributeDefinition("embedded.deepEmbedded",
-		AttributeType.STRING, null));
+	attributes.add(new org.devspark.aws.lorm.schema.AttributeDefinition(
+		"someRandomField", AttributeType.STRING, null));
+	attributes.add(new org.devspark.aws.lorm.schema.AttributeDefinition(
+		"embedded.someField", AttributeType.STRING, null));
+	attributes.add(new org.devspark.aws.lorm.schema.AttributeDefinition(
+		"embedded.deepEmbedded", AttributeType.STRING, null));
 
 	EntityToItemMapperImpl<SampleEntity> mapper = new EntityToItemMapperImpl<SampleEntity>(
 		SampleEntity.class);
@@ -195,7 +226,8 @@ public class EntityToItemMapperImplTest {
 	// TODO expect error of recursive dependency path
 	Assert.assertEquals(1, positiveCaseValidationErrors.size());
 
-	SchemaValidationError recursiveDependencyError = positiveCaseValidationErrors.get(0);
+	SchemaValidationError recursiveDependencyError = positiveCaseValidationErrors
+		.get(0);
 	Assert.assertNotNull(recursiveDependencyError);
 	Assert.assertEquals(SchemaValidationErrorType.GENERAL,
 		recursiveDependencyError.getErrorType());

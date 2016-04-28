@@ -11,13 +11,14 @@ import org.devspark.aws.lorm.schema.validation.SchemaValidationError;
 
 public interface EntityToItemMappingStrategy {
 
-    List<SchemaValidationError> hasValidSchema(EntitySchema entitySchema, Class<?> entityClass,
-	    Field field, String fieldNamePrefix);
+    List<SchemaValidationError> hasValidSchema(EntitySchema entitySchema,
+	    Class<?> entityClass, Field field, String fieldNamePrefix);
 
-    List<AttributeDefinition> getSchemaUpdate(EntitySchema entitySchema, Class<?> entityClass,
-	    Field field, String fieldNamePrefix);
+    List<AttributeDefinition> getSchemaUpdate(EntitySchema entitySchema,
+	    Class<?> entityClass, Field field, String fieldNamePrefix);
 
-    List<EntityFieldAsAttribute> getEntityFieldAsAttribute(Field field, String fieldNamePrefix);
+    List<EntityFieldAsAttribute> getEntityFieldAsAttribute(Field field,
+	    String fieldNamePrefix);
 
     boolean apply(Field field);
 

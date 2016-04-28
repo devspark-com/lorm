@@ -35,8 +35,8 @@ public class ItemToEntityMapperImpl<E> implements ItemToEntityMapper<E> {
 	mappingStrategies = new ArrayList<ItemToEntityMappingStrategy>();
 	mappingStrategies.add(new TransientItemToEntityMappingStrategy());
 	mappingStrategies.add(new OneToManyItemToEntityMappingStrategy());
-	mappingStrategies
-		.add(new ManyToOneItemToEntityMappingStrategy(reflectionSupport, entityManager));
+	mappingStrategies.add(new ManyToOneItemToEntityMappingStrategy(reflectionSupport,
+		entityManager));
 	mappingStrategies.add(new DateItemToEntityMappingStrategy(reflectionSupport));
 	mappingStrategies.add(new DefaultItemToEntityMappingStrategy(reflectionSupport));
     }
@@ -47,8 +47,8 @@ public class ItemToEntityMapperImpl<E> implements ItemToEntityMapper<E> {
 	return (E) map(attributes, entityClass, "");
     }
 
-    public Object map(Map<AttributeDefinition, Object> attributes, Class<?> entityClassToParse,
-	    String fieldNamePrefix) {
+    public Object map(Map<AttributeDefinition, Object> attributes,
+	    Class<?> entityClassToParse, String fieldNamePrefix) {
 	ReflectionSupport reflectionSupport = new ReflectionSupport();
 
 	List<Field> fields = reflectionSupport.getAllFields(entityClassToParse);
@@ -90,7 +90,8 @@ public class ItemToEntityMapperImpl<E> implements ItemToEntityMapper<E> {
 
 	    if (field.getAnnotation(Embedded.class) != null) {
 		if (field.getType().getAnnotation(Embeddable.class) != null) {
-		    String embeddedFieldNamePrefix = fieldNamePrefix + field.getName() + ".";
+		    String embeddedFieldNamePrefix = fieldNamePrefix + field.getName()
+			    + ".";
 		    Object embeddedValue = map(attributes, field.getType(),
 			    embeddedFieldNamePrefix);
 		    reflectionSupport.setValueOfField(field, instance, embeddedValue);

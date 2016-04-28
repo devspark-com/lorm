@@ -15,7 +15,8 @@ import org.devspark.aws.lorm.schema.AttributeDefinition;
 import org.devspark.aws.lorm.schema.AttributeType;
 import org.devspark.aws.lorm.schema.validation.EntityFieldAsAttribute;
 
-public class ManyToOneEntityToItemMappingStrategy extends DefaultEntityToItemMappingStrategy {
+public class ManyToOneEntityToItemMappingStrategy
+	extends DefaultEntityToItemMappingStrategy {
 
     public ManyToOneEntityToItemMappingStrategy(ReflectionSupport reflectionSupport) {
 	super(reflectionSupport);
@@ -32,8 +33,10 @@ public class ManyToOneEntityToItemMappingStrategy extends DefaultEntityToItemMap
     }
 
     @Override
-    protected AttributeDefinition buildAttributeDefinition(Field field, String fieldNamePrefix) {
-	Field refIdField = reflectionSupport.getFieldWithAnnotation(field.getType(), Id.class);
+    protected AttributeDefinition buildAttributeDefinition(Field field,
+	    String fieldNamePrefix) {
+	Field refIdField = reflectionSupport.getFieldWithAnnotation(field.getType(),
+		Id.class);
 
 	return new AttributeDefinition(
 		fieldNamePrefix + field.getName() + "." + refIdField.getName(),
@@ -51,7 +54,8 @@ public class ManyToOneEntityToItemMappingStrategy extends DefaultEntityToItemMap
 		    "Collection not expected for a @ManyToOne relationship");
 	}
 
-	Field refIdField = reflectionSupport.getFieldWithAnnotation(field.getType(), Id.class);
+	Field refIdField = reflectionSupport.getFieldWithAnnotation(field.getType(),
+		Id.class);
 	Object value;
 	if (refValue != null) {
 	    value = reflectionSupport.getValueOfField(refIdField, refValue);
@@ -66,7 +70,8 @@ public class ManyToOneEntityToItemMappingStrategy extends DefaultEntityToItemMap
     @Override
     public List<EntityFieldAsAttribute> getEntityFieldAsAttribute(Field field,
 	    String fieldNamePrefix) {
-	Field refIdField = reflectionSupport.getFieldWithAnnotation(field.getType(), Id.class);
+	Field refIdField = reflectionSupport.getFieldWithAnnotation(field.getType(),
+		Id.class);
 
 	List<EntityFieldAsAttribute> attrs = new ArrayList<EntityFieldAsAttribute>();
 	attrs.add(new EntityFieldAsAttribute(String.class,

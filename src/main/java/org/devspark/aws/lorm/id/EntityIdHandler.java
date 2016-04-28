@@ -45,18 +45,22 @@ public class EntityIdHandler {
 	try {
 	    Class<?> idGeneratorClass = Class.forName(idAnnotation.generator());
 	    if (!IdGenerator.class.isAssignableFrom(idGeneratorClass)) {
-		throw new DataException("Invalid id generator class: " + idAnnotation.generator());
+		throw new DataException(
+			"Invalid id generator class: " + idAnnotation.generator());
 	    }
 
 	    IdGenerator idGenerator = (IdGenerator) idGeneratorClass.newInstance();
 	    id = idGenerator.generateId();
 
 	} catch (ClassNotFoundException e) {
-	    throw new DataException("Id generator class not found: " + idAnnotation.generator());
+	    throw new DataException(
+		    "Id generator class not found: " + idAnnotation.generator());
 	} catch (IllegalAccessException ex) {
-	    throw new DataException("Cannot instantiate id generator: " + idAnnotation.generator());
+	    throw new DataException(
+		    "Cannot instantiate id generator: " + idAnnotation.generator());
 	} catch (InstantiationException ex) {
-	    throw new DataException("Cannot instantiate id generator: " + idAnnotation.generator());
+	    throw new DataException(
+		    "Cannot instantiate id generator: " + idAnnotation.generator());
 	}
 
 	return id;

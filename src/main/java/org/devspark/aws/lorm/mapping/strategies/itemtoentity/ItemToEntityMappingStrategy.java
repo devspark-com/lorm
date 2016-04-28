@@ -9,6 +9,7 @@ public interface ItemToEntityMappingStrategy {
 
     boolean apply(Field field);
 
-    void map(Entry<AttributeDefinition, Object> itemEntry, Field field, Object entityInstance);
+    void map(Entry<AttributeDefinition, Object> itemEntry, Field field,
+	    Object entityInstance);
 
 }
