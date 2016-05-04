@@ -122,17 +122,17 @@ public class EntityToItemMapperImplTest {
 		Expense.class);
 
 	List<SchemaValidationError> positiveCaseValidationErrors = mapper
-		.validateSchema(new EntitySchema("expense", attributes));
+		.validateSchema(new EntitySchema("expense", attributes, null));
 	Assert.assertTrue(positiveCaseValidationErrors.isEmpty());
 
 	List<AttributeDefinition> missingFieldsInEntityClass = mapper
 		.getMissingAttributesInEntityClass(
-			new EntitySchema("expense", attributes));
+			new EntitySchema("expense", attributes, null));
 	Assert.assertTrue(missingFieldsInEntityClass.isEmpty());
 
 	List<AttributeDefinition> missingFieldsInTable = mapper
 		.getMissingAttributesInEntityClass(
-			new EntitySchema("expense", attributes));
+			new EntitySchema("expense", attributes, null));
 	Assert.assertTrue(missingFieldsInTable.isEmpty());
 
 	attributes.clear();
@@ -148,7 +148,7 @@ public class EntityToItemMapperImplTest {
 		"attachment.description", AttributeType.STRING, null));
 
 	List<SchemaValidationError> negativeCaseValidationErrors = mapper
-		.validateSchema(new EntitySchema("expense", attributes));
+		.validateSchema(new EntitySchema("expense", attributes, null));
 	Assert.assertFalse(negativeCaseValidationErrors.isEmpty());
 	Assert.assertEquals(5, negativeCaseValidationErrors.size());
 
@@ -161,11 +161,11 @@ public class EntityToItemMapperImplTest {
 
 	List<AttributeDefinition> negativeMissingFieldsInEntityClass = mapper
 		.getMissingAttributesInEntityClass(
-			new EntitySchema("expense", attributes));
+			new EntitySchema("expense", attributes, null));
 	Assert.assertTrue(negativeMissingFieldsInEntityClass.isEmpty());
 
 	List<AttributeDefinition> negativeFieldsInTable = mapper
-		.getMissingFieldsInTable(new EntitySchema("expense", attributes));
+		.getMissingFieldsInTable(new EntitySchema("expense", attributes, null));
 	Assert.assertFalse(negativeFieldsInTable.isEmpty());
 	Assert.assertEquals(5, negativeFieldsInTable.size());
 
@@ -221,7 +221,7 @@ public class EntityToItemMapperImplTest {
 		SampleEntity.class);
 
 	List<SchemaValidationError> positiveCaseValidationErrors = mapper
-		.validateSchema(new EntitySchema("sampleentity", attributes));
+		.validateSchema(new EntitySchema("sampleentity", attributes, null));
 
 	// TODO expect error of recursive dependency path
 	Assert.assertEquals(1, positiveCaseValidationErrors.size());

@@ -11,4 +11,6 @@ public interface SchemaSupport<T> {
     boolean syncToSchema(boolean deleteMissingFields, boolean createTableIfNotExists,
 	    boolean createReferences);
 
+    boolean deleteTable();
+    
 }

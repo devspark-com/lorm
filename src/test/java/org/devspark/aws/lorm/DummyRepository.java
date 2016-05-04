@@ -59,6 +59,11 @@ public class DummyRepository<T> implements Repository<T> {
     }
 
     @Override
+    public List<T> query(String attributeName, String value) {
+        return null;
+    }
+    
+    @Override
     public void deleteById(String id) {
 	instances.remove(id);
     }

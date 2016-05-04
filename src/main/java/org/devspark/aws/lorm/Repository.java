@@ -9,6 +9,8 @@ public interface Repository<T> {
     // TODO add page support
     List<T> findAll();
 
+    List<T> query(String attributeName, String value);
+
     T save(T instance);
 
     List<T> save(List<T> instances);
