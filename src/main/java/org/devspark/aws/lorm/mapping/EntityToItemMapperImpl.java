@@ -16,6 +16,7 @@ import javax.validation.ValidatorFactory;
 
 import org.devspark.aws.lorm.ReflectionSupport;
 import org.devspark.aws.lorm.exceptions.DataValidationException;
+import org.devspark.aws.lorm.mapping.strategies.entitytoitem.ListEntityToItemMappingStrategy;
 import org.devspark.aws.lorm.mapping.strategies.entitytoitem.DateEntityToItemMappingStrategy;
 import org.devspark.aws.lorm.mapping.strategies.entitytoitem.DefaultEntityToItemMappingStrategy;
 import org.devspark.aws.lorm.mapping.strategies.entitytoitem.EntityToItemMappingStrategy;
@@ -47,6 +48,7 @@ public class EntityToItemMapperImpl<T>
         mappingStrategies
                 .add(new ManyToOneEntityToItemMappingStrategy(reflectionSupport));
         mappingStrategies.add(new DateEntityToItemMappingStrategy(reflectionSupport));
+        mappingStrategies.add(new ListEntityToItemMappingStrategy(reflectionSupport));
         mappingStrategies.add(new DefaultEntityToItemMappingStrategy(reflectionSupport));
 
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
@@ -72,34 +74,19 @@ public class EntityToItemMapperImpl<T>
 
         List<Field> fields = reflectionSupport.getAllFields(entity.getClass());
         for (Field field : fields) {
-            if (field.getAnnotation(Embedded.class) != null) {
-                if (field.getType().getAnnotation(Embeddable.class) == null
-                        && !field.getType().isAssignableFrom(List.class)) {
+            if (field.getAnnotation(Embedded.class) != null
+                    && !field.getType().isAssignableFrom(List.class)) {
+                if (field.getType().getAnnotation(Embeddable.class) == null) {
                     throw new DataValidationException(
                             "Error while mapping " + entityClass.getName() + " .Reason: "
                                     + field.getType().getName()
                                     + " is not embeddable neither a List");
                 }
 
-                if (field.getType().isAssignableFrom(List.class)) {
-                    List<Object> embeddeds = (List) reflectionSupport
-                            .getValueOfField(field, entity);
-                    if (embeddeds != null) {
-                        int embeddedIdx = 0;
-                        for (Object embeddedInstance : embeddeds) {
-                            String embeddedFieldamePrefix = sourceFieldNamePrefix
-                                    + field.getName() + "." + (embeddedIdx++) + ".";
-                            attributes.putAll(map(embeddedInstance,
-                                    embeddedFieldamePrefix, sourceFieldNamePrefix));
-                        }
-                    }
-                } else {
-                    String embeddedFieldamePrefix = fieldNamePrefix + field.getName()
-                            + ".";
-                    Object embedded = reflectionSupport.getValueOfField(field, entity);
-                    attributes.putAll(map(embedded, embeddedFieldamePrefix,
-                            embeddedFieldamePrefix));
-                }
+                String embeddedFieldamePrefix = fieldNamePrefix + field.getName() + ".";
+                Object embedded = reflectionSupport.getValueOfField(field, entity);
+                attributes.putAll(
+                        map(embedded, embeddedFieldamePrefix, embeddedFieldamePrefix));
 
             } else {
                 for (EntityToItemMappingStrategy mappingStrategy : mappingStrategies) {
@@ -147,6 +134,11 @@ public class EntityToItemMapperImpl<T>
         ReflectionSupport reflectionSupport = new ReflectionSupport();
         List<Field> fields = reflectionSupport.getAllFields(entityClassToParse);
         for (Field field : fields) {
+            // TODO validate Lists
+            if (List.class.isAssignableFrom(field.getType())) {
+                continue;
+            }
+            
             if (field.getAnnotation(Embedded.class) != null) {
                 if (field.getType().getAnnotation(Embeddable.class) != null) {
                     // TODO move field naming to an strategy?

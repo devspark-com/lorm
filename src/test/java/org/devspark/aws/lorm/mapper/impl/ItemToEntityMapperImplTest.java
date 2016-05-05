@@ -23,96 +23,108 @@ public class ItemToEntityMapperImplTest {
 
     @Test
     public void testMap() {
-	Category category = new Category();
-	category.setId("categoryid");
-	category.setDescription("category description");
-	DummyEntityManager.get().getRepository(Category.class).save(category);
+        Category category = new Category();
+        category.setId("categoryid");
+        category.setDescription("category description");
+        DummyEntityManager.get().getRepository(Category.class).save(category);
 
-	Merchant merchant = new Merchant();
-	merchant.setId("merchantid");
-	merchant.setName("merchant name");
-	DummyEntityManager.get().getRepository(Merchant.class).save(merchant);
+        Merchant merchant = new Merchant();
+        merchant.setId("merchantid");
+        merchant.setName("merchant name");
+        DummyEntityManager.get().getRepository(Merchant.class).save(merchant);
 
-	Reporter reporter = new Reporter();
-	reporter.setId("reporterid");
-	reporter.setName("reporter name");
-	DummyEntityManager.get().getRepository(Reporter.class).save(reporter);
+        Reporter reporter = new Reporter();
+        reporter.setId("reporterid");
+        reporter.setName("reporter name");
+        DummyEntityManager.get().getRepository(Reporter.class).save(reporter);
 
-	Map<AttributeDefinition, Object> attributes = new HashMap<AttributeDefinition, Object>();
-	Set<AttributeConstraint> pkConstraints = new HashSet<AttributeConstraint>();
-	pkConstraints.add(AttributeConstraint.buildPrimaryKeyConstraint());
-	attributes.put(new AttributeDefinition("id", AttributeType.STRING, pkConstraints),
-		"expenseid");
-	attributes.put(new AttributeDefinition("description", AttributeType.STRING, null),
-		"expense description");
-	attributes.put(new AttributeDefinition("category.id", AttributeType.STRING, null),
-		"categoryid");
-	attributes.put(new AttributeDefinition("merchant.id", AttributeType.STRING, null),
-		"merchantid");
-	attributes.put(new AttributeDefinition("reporter.id", AttributeType.STRING, null),
-		"reporterid");
-	attributes.put(new AttributeDefinition("date", AttributeType.NUMBER, null), 999999);
-	attributes.put(new AttributeDefinition("attachment.location", AttributeType.STRING, null),
-		"attachment location");
-	attributes.put(
-		new AttributeDefinition("attachment.description", AttributeType.STRING, null),
-		"attachment description");
-	attributes.put(new AttributeDefinition("expenseType", AttributeType.STRING, null),
-		"REIMBURSABLE");
+        Map<AttributeDefinition, Object> attributes = new HashMap<AttributeDefinition, Object>();
+        Set<AttributeConstraint> pkConstraints = new HashSet<AttributeConstraint>();
+        pkConstraints.add(AttributeConstraint.buildPrimaryKeyConstraint());
+        attributes.put(new AttributeDefinition("id", AttributeType.STRING, pkConstraints),
+                "expenseid");
+        attributes.put(new AttributeDefinition("description", AttributeType.STRING, null),
+                "expense description");
+        attributes.put(new AttributeDefinition("category.id", AttributeType.STRING, null),
+                "categoryid");
+        attributes.put(new AttributeDefinition("merchant.id", AttributeType.STRING, null),
+                "merchantid");
+        attributes.put(new AttributeDefinition("reporter.id", AttributeType.STRING, null),
+                "reporterid");
+        attributes.put(new AttributeDefinition("date", AttributeType.NUMBER, null),
+                999999);
+        attributes.put(new AttributeDefinition("attachment.location",
+                AttributeType.STRING, null), "attachment location");
+        attributes.put(new AttributeDefinition("attachment.description",
+                AttributeType.STRING, null), "attachment description");
+        attributes.put(new AttributeDefinition("expenseType", AttributeType.STRING, null),
+                "REIMBURSABLE");
 
-	ItemToEntityMapperImpl<Expense> expenseMapper = new ItemToEntityMapperImpl<Expense>(
-		Expense.class, DummyEntityManager.get());
-	Expense expense = expenseMapper.map(attributes);
+        ItemToEntityMapperImpl<Expense> expenseMapper = new ItemToEntityMapperImpl<Expense>(
+                Expense.class, DummyEntityManager.get());
+        Expense expense = expenseMapper.map(attributes);
 
-	Assert.assertEquals("expenseid", expense.getId());
-	Assert.assertEquals("merchantid", expense.getMerchant().getId());
-	Assert.assertEquals("categoryid", expense.getCategory().getId());
-	Assert.assertEquals("reporterid", expense.getReporter().getId());
-	Assert.assertEquals(999999, expense.getDate().getTime());
-	Assert.assertNotNull(expense.getAttachment());
-	Assert.assertEquals("attachment location", expense.getAttachment().getLocation());
-	Assert.assertEquals("attachment description", expense.getAttachment().getDescription());
-	Assert.assertEquals(ExpenseType.REIMBURSABLE, expense.getExpenseType());
+        Assert.assertEquals("expenseid", expense.getId());
+        Assert.assertEquals("merchantid", expense.getMerchant().getId());
+        Assert.assertEquals("categoryid", expense.getCategory().getId());
+        Assert.assertEquals("reporterid", expense.getReporter().getId());
+        Assert.assertEquals(999999, expense.getDate().getTime());
+        Assert.assertNotNull(expense.getAttachment());
+        Assert.assertEquals("attachment location", expense.getAttachment().getLocation());
+        Assert.assertEquals("attachment description",
+                expense.getAttachment().getDescription());
+        Assert.assertEquals(ExpenseType.REIMBURSABLE, expense.getExpenseType());
     }
 
     @Test
     public void testDeepEmbedded() {
-	Map<AttributeDefinition, Object> attributes = new HashMap<AttributeDefinition, Object>();
-	Set<AttributeConstraint> pkConstraints = new HashSet<AttributeConstraint>();
-	pkConstraints.add(AttributeConstraint.buildPrimaryKeyConstraint());
-	attributes.put(new AttributeDefinition("id", AttributeType.STRING, pkConstraints),
-		"sampleentityid");
-	attributes.put(new AttributeDefinition("someRandomField", AttributeType.STRING, null),
-		"sample entity description");
-        attributes.put(new AttributeDefinition("embeddeds.0.someField", AttributeType.STRING, null),
-                "some field in list 0");
-        attributes.put(new AttributeDefinition("embeddeds.1.someField", AttributeType.STRING, null),
-                "some field in list 1");
-        
-	attributes.put(new AttributeDefinition("embedded.someField", AttributeType.STRING, null),
-		"some field 1");
-	attributes.put(new AttributeDefinition("embedded.deepEmbedded.someField",
-		AttributeType.STRING, null), "some field 2");
-	attributes.put(new AttributeDefinition("embedded.deepEmbedded.deepEmbedded.someField",
-		AttributeType.STRING, null), "some field 3");
+        Map<AttributeDefinition, Object> attributes = new HashMap<AttributeDefinition, Object>();
+        Set<AttributeConstraint> pkConstraints = new HashSet<AttributeConstraint>();
+        pkConstraints.add(AttributeConstraint.buildPrimaryKeyConstraint());
+        attributes.put(new AttributeDefinition("id", AttributeType.STRING, pkConstraints),
+                "sampleentityid");
+        attributes.put(
+                new AttributeDefinition("someRandomField", AttributeType.STRING, null),
+                "sample entity description");
+        attributes.put(new AttributeDefinition("embeddeds", AttributeType.STRING, null),
+                "[{\"someField\":\"some field 1\",\"deepEmbedded\":{\"someField\":\"some field 0\",\""
+                        + "deepEmbedded\":null}},{\"someField\":\"some field 1\",\"deepEmbedded\":"
+                        + "{\"someField\":\"some field 0\",\"deepEmbedded\":null}},{\"someField\""
+                        + ":\"some field 1\",\"deepEmbedded\":{\"someField\":\"some field 0\""
+                        + ",\"deepEmbedded\":null}}]");
 
-	ItemToEntityMapperImpl<SampleEntity> sampleEntityMapper = new ItemToEntityMapperImpl<SampleEntity>(
-		SampleEntity.class, DummyEntityManager.get());
+        attributes.put(
+                new AttributeDefinition("embedded.someField", AttributeType.STRING, null),
+                "some field 1");
+        attributes.put(new AttributeDefinition("embedded.deepEmbedded.someField",
+                AttributeType.STRING, null), "some field 2");
+        attributes.put(
+                new AttributeDefinition("embedded.deepEmbedded.deepEmbedded.someField",
+                        AttributeType.STRING, null),
+                "some field 3");
 
-	SampleEntity sampleEntity = sampleEntityMapper.map(attributes);
-	Assert.assertEquals("sampleentityid", sampleEntity.getId());
-	Assert.assertEquals("sample entity description", sampleEntity.getSomeRandomField());
+        ItemToEntityMapperImpl<SampleEntity> sampleEntityMapper = new ItemToEntityMapperImpl<SampleEntity>(
+                SampleEntity.class, DummyEntityManager.get());
 
-	Assert.assertNotNull(sampleEntity.getEmbedded());
-	Assert.assertEquals("some field 1", sampleEntity.getEmbedded().getSomeField());
+        SampleEntity sampleEntity = sampleEntityMapper.map(attributes);
+        Assert.assertEquals("sampleentityid", sampleEntity.getId());
+        Assert.assertEquals("sample entity description",
+                sampleEntity.getSomeRandomField());
 
-	Assert.assertNotNull(sampleEntity.getEmbedded().getDeepEmbedded());
-	Assert.assertEquals("some field 2",
-		sampleEntity.getEmbedded().getDeepEmbedded().getSomeField());
+        Assert.assertNotNull(sampleEntity.getEmbedded());
+        Assert.assertEquals("some field 1", sampleEntity.getEmbedded().getSomeField());
 
-	Assert.assertNotNull(sampleEntity.getEmbedded().getDeepEmbedded().getDeepEmbedded());
-	Assert.assertEquals("some field 3",
-		sampleEntity.getEmbedded().getDeepEmbedded().getDeepEmbedded().getSomeField());
+        Assert.assertNotNull(sampleEntity.getEmbedded().getDeepEmbedded());
+        Assert.assertEquals("some field 2",
+                sampleEntity.getEmbedded().getDeepEmbedded().getSomeField());
 
+        Assert.assertNotNull(
+                sampleEntity.getEmbedded().getDeepEmbedded().getDeepEmbedded());
+        Assert.assertEquals("some field 3", sampleEntity.getEmbedded().getDeepEmbedded()
+                .getDeepEmbedded().getSomeField());
+
+        Assert.assertNotNull(sampleEntity.getEmbeddeds());
+        Assert.assertEquals(3, sampleEntity.getEmbeddeds().size());
+        Assert.assertEquals("some field 1", sampleEntity.getEmbeddeds().get(0).getSomeField());
     }
 }

@@ -2,6 +2,7 @@ package org.devspark.aws.lorm.mapping;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,6 +15,7 @@ import org.devspark.aws.lorm.EntityManager;
 import org.devspark.aws.lorm.ReflectionSupport;
 import org.devspark.aws.lorm.exceptions.DataValidationException;
 import org.devspark.aws.lorm.id.EntityIdHandler;
+import org.devspark.aws.lorm.mapping.strategies.itemtoentity.ListItemToEntityMappingStrategy;
 import org.devspark.aws.lorm.mapping.strategies.itemtoentity.DateItemToEntityMappingStrategy;
 import org.devspark.aws.lorm.mapping.strategies.itemtoentity.DefaultItemToEntityMappingStrategy;
 import org.devspark.aws.lorm.mapping.strategies.itemtoentity.ItemToEntityMappingStrategy;
@@ -38,21 +40,20 @@ public class ItemToEntityMapperImpl<E> implements ItemToEntityMapper<E> {
         mappingStrategies.add(new ManyToOneItemToEntityMappingStrategy(reflectionSupport,
                 entityManager));
         mappingStrategies.add(new DateItemToEntityMappingStrategy(reflectionSupport));
+        mappingStrategies.add(new ListItemToEntityMappingStrategy(reflectionSupport));
         mappingStrategies.add(new DefaultItemToEntityMappingStrategy(reflectionSupport));
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public E map(Map<AttributeDefinition, Object> attributes) {
-        return (E) map(attributes, entityClass, "", -1);
+        return (E) map(attributes, entityClass, "");
     }
 
     public Object map(Map<AttributeDefinition, Object> attributes,
-            Class<?> entityClassToParse, String fieldNamePrefix, int index) {
+            Class<?> entityClassToParse, String fieldNamePrefix) {
         ReflectionSupport reflectionSupport = new ReflectionSupport();
 
-        System.out.println(fieldNamePrefix);
-        
         List<Field> fields = reflectionSupport.getAllFields(entityClassToParse);
         Object instance = reflectionSupport.instantiate(entityClassToParse);
         for (Entry<AttributeDefinition, Object> itemEntry : attributes.entrySet()) {
@@ -96,31 +97,19 @@ public class ItemToEntityMapperImpl<E> implements ItemToEntityMapper<E> {
                 continue;
             }
 
-            if (field.getAnnotation(Embedded.class) != null) {
+            if (field.getAnnotation(Embedded.class) != null && 
+                    !Collection.class.isAssignableFrom(field.getType())) {
                 if (field.getType().getAnnotation(Embeddable.class) != null) {
                     String embeddedFieldNamePrefix = fieldNamePrefix + field.getName()
                             + ".";
                     Object embeddedValue = map(attributes, field.getType(),
-                            embeddedFieldNamePrefix, index);
+                            embeddedFieldNamePrefix);
                     reflectionSupport.setValueOfField(field, instance, embeddedValue);
-                } else if (field.getType().isAssignableFrom(List.class)) {
-                    String sourceAttrName = itemEntry.getKey().getName();
-
-                    String embeddedFieldNamePrefix = fieldNamePrefix + field.getName()
-                            + "." + 0 + ".";
-
-                    System.out.println("It's a list .... Key->" + fieldKey + ", prefix ->"
-                            + fieldNamePrefix);
-
-                    List<Object> theList = new ArrayList<>();
-                    reflectionSupport.setValueOfField(field, instance, theList);
-                    theList.add(
-                            map(attributes, field.getType(), embeddedFieldNamePrefix, index));
                 } else {
                     throw new DataValidationException("Error while mapping attributes to "
                             + entityClassToParse.getName() + " .Reason: "
                             + field.getType().getName()
-                            + " is not embeddablea neither a List");
+                            + " is not embeddable neither a Collection");
                 }
             } else {
                 for (ItemToEntityMappingStrategy mappingStrategy : mappingStrategies) {

@@ -2,6 +2,7 @@ package org.devspark.aws.lorm.mapping.strategies.entitytoitem;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,8 @@ public class DefaultEntityToItemMappingStrategy implements EntityToItemMappingSt
 	    attrType = AttributeType.STRING;
 	} else if (Number.class.isAssignableFrom(field.getType())) {
 	    attrType = AttributeType.NUMBER;
+	} else if (Collection.class.isAssignableFrom(field.getType())) {
+	    attrType = AttributeType.STRING;
 	} else {
 	    throw new DataValidationException(
 		    "Schema update not supported for type: " + field.getType().getName());
@@ -163,8 +166,16 @@ public class DefaultEntityToItemMappingStrategy implements EntityToItemMappingSt
     @Override
     public void map(Object entity, Field field, String fieldNamePrefix,
 	    Map<AttributeDefinition, Object> attributes) {
+        Object value;
+        
+        if (field.getType().isEnum()) {
+            value = reflectionSupport.getValueOfField(field, entity).toString();
+        } else {
+            value = reflectionSupport.getValueOfField(field, entity);
+        }
+        
 	attributes.put(buildAttributeDefinition(field, fieldNamePrefix),
-		reflectionSupport.getValueOfField(field, entity));
+		value);
     }
 
     @Override

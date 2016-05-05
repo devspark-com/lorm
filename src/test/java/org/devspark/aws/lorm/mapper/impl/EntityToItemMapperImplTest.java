@@ -70,6 +70,7 @@ public class EntityToItemMapperImplTest {
         expense.setMerchant(merchant);
         expense.setCategory(category);
         expense.setReporter(reporter);
+        expense.setExpenseType(ExpenseType.NOT_REIMBURSABLE);
         expense.setAmount(new BigDecimal(10));
         long now = System.currentTimeMillis();
         expense.setDate(new Date(now));
@@ -82,9 +83,10 @@ public class EntityToItemMapperImplTest {
         Assert.assertEquals("merchantid", attrs.get(buildAttrDefByName("merchant.id")));
         Assert.assertEquals("categoryid", attrs.get(buildAttrDefByName("category.id")));
         Assert.assertEquals("reporterid", attrs.get(buildAttrDefByName("reporter.id")));
+        Assert.assertEquals("REIMBURSABLE", attrs.get(buildAttrDefByName("expenseType")));
         Assert.assertEquals(new BigDecimal(10), attrs.get(buildAttrDefByName("amount")));
         Assert.assertEquals(now, attrs.get(buildAttrDefByName("date")));
-        Assert.assertEquals(ExpenseType.REIMBURSABLE,
+        Assert.assertEquals("REIMBURSABLE",
                 attrs.get(buildAttrDefByName("expenseType")));
     }
 
@@ -209,15 +211,11 @@ public class EntityToItemMapperImplTest {
         }
 
         for (int m = 0; m < 0; m++) {
-            AttributeDefinition expectedListAttr = new AttributeDefinition(
-                    "embeddeds." + m + ".someField", AttributeType.STRING, null);
+            AttributeDefinition expectedListAttr = new AttributeDefinition("embeddeds",
+                    AttributeType.STRING, null);
             Assert.assertTrue(attrs.containsKey(expectedListAttr));
-            Assert.assertEquals("some field 0", attrs.get(expectedListAttr));
         }
-        
-        for (AttributeDefinition attrDef : attrs.keySet()) {
-            System.out.println(attrDef.getName());
-        }
+
     }
 
     @Test
