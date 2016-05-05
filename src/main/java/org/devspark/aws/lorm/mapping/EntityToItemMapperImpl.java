@@ -29,7 +29,7 @@ import org.devspark.aws.lorm.schema.validation.EntitySchemaSupport;
 import org.devspark.aws.lorm.schema.validation.SchemaValidationError;
 
 public class EntityToItemMapperImpl<T>
-	implements EntityToItemMapper, EntitySchemaSupport {
+        implements EntityToItemMapper, EntitySchemaSupport {
 
     private final Class<T> entityClass;
     private final List<EntityToItemMappingStrategy> mappingStrategies;
@@ -37,247 +37,267 @@ public class EntityToItemMapperImpl<T>
 
     public EntityToItemMapperImpl(Class<T> entityClass) {
 
-	super();
-	this.entityClass = entityClass;
+        super();
+        this.entityClass = entityClass;
 
-	ReflectionSupport reflectionSupport = new ReflectionSupport();
-	this.mappingStrategies = new ArrayList<EntityToItemMappingStrategy>();
-	mappingStrategies.add(new TransientEntityMappingStrategy());
-	mappingStrategies.add(new OneToManyEntityMappingStrategy());
-	mappingStrategies
-		.add(new ManyToOneEntityToItemMappingStrategy(reflectionSupport));
-	mappingStrategies.add(new DateEntityToItemMappingStrategy(reflectionSupport));
-	mappingStrategies.add(new DefaultEntityToItemMappingStrategy(reflectionSupport));
+        ReflectionSupport reflectionSupport = new ReflectionSupport();
+        this.mappingStrategies = new ArrayList<EntityToItemMappingStrategy>();
+        mappingStrategies.add(new TransientEntityMappingStrategy());
+        mappingStrategies.add(new OneToManyEntityMappingStrategy());
+        mappingStrategies
+                .add(new ManyToOneEntityToItemMappingStrategy(reflectionSupport));
+        mappingStrategies.add(new DateEntityToItemMappingStrategy(reflectionSupport));
+        mappingStrategies.add(new DefaultEntityToItemMappingStrategy(reflectionSupport));
 
-	ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-	validator = factory.getValidator();
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
     }
 
     @Override
     public Map<AttributeDefinition, Object> map(Object entity) {
-	return map(entity, "");
+        return map(entity, "", "");
     }
 
-    private Map<AttributeDefinition, Object> map(Object entity, String fieldNamePrefix) {
-	ReflectionSupport reflectionSupport = new ReflectionSupport();
-	Map<AttributeDefinition, Object> attributes = new HashMap<AttributeDefinition, Object>();
+    private Map<AttributeDefinition, Object> map(Object entity, String fieldNamePrefix,
+            String sourceFieldNamePrefix) {
+        ReflectionSupport reflectionSupport = new ReflectionSupport();
+        Map<AttributeDefinition, Object> attributes = new HashMap<AttributeDefinition, Object>();
 
-	if (entity == null) {
-	    return attributes;
-	}
+        if (entity == null) {
+            return attributes;
+        }
 
-	// it is assumed that entity will be validated before
-	// mapping to Item
+        // it is assumed that entity will be validated before
+        // mapping to Item
 
-	List<Field> fields = reflectionSupport.getAllFields(entity.getClass());
-	for (Field field : fields) {
-	    if (field.getAnnotation(Embedded.class) != null) {
-		if (field.getType().getAnnotation(Embeddable.class) != null) {
-		    String embeddedFieldamePrefix = fieldNamePrefix + field.getName()
-			    + ".";
-		    Object embedded = reflectionSupport.getValueOfField(field, entity);
-		    attributes.putAll(map(embedded, embeddedFieldamePrefix));
-		} else {
-		    throw new DataValidationException(
-			    "Error while mapping " + entityClass.getName() + " .Reason: "
-				    + field.getType().getName() + " is not embeddable");
-		}
-	    } else {
-		for (EntityToItemMappingStrategy mappingStrategy : mappingStrategies) {
-		    if (mappingStrategy.apply(field)) {
-			mappingStrategy.map(entity, field, fieldNamePrefix, attributes);
-			assertFieldConstraints(entity, field.getName());
+        List<Field> fields = reflectionSupport.getAllFields(entity.getClass());
+        for (Field field : fields) {
+            if (field.getAnnotation(Embedded.class) != null) {
+                if (field.getType().getAnnotation(Embeddable.class) == null
+                        && !field.getType().isAssignableFrom(List.class)) {
+                    throw new DataValidationException(
+                            "Error while mapping " + entityClass.getName() + " .Reason: "
+                                    + field.getType().getName()
+                                    + " is not embeddable neither a List");
+                }
 
-			break;
-		    }
+                if (field.getType().isAssignableFrom(List.class)) {
+                    List<Object> embeddeds = (List) reflectionSupport
+                            .getValueOfField(field, entity);
+                    if (embeddeds != null) {
+                        int embeddedIdx = 0;
+                        for (Object embeddedInstance : embeddeds) {
+                            String embeddedFieldamePrefix = sourceFieldNamePrefix
+                                    + field.getName() + "." + (embeddedIdx++) + ".";
+                            attributes.putAll(map(embeddedInstance,
+                                    embeddedFieldamePrefix, sourceFieldNamePrefix));
+                        }
+                    }
+                } else {
+                    String embeddedFieldamePrefix = fieldNamePrefix + field.getName()
+                            + ".";
+                    Object embedded = reflectionSupport.getValueOfField(field, entity);
+                    attributes.putAll(map(embedded, embeddedFieldamePrefix,
+                            embeddedFieldamePrefix));
+                }
 
-		}
-	    }
-	}
+            } else {
+                for (EntityToItemMappingStrategy mappingStrategy : mappingStrategies) {
+                    if (mappingStrategy.apply(field)) {
+                        mappingStrategy.map(entity, field, fieldNamePrefix, attributes);
+                        assertFieldConstraints(entity, field.getName());
 
-	return attributes;
+                        break;
+                    }
+
+                }
+            }
+        }
+
+        return attributes;
+
     }
 
     private void assertFieldConstraints(Object entity, String attribute) {
-	Set<ConstraintViolation<Object>> constraintViolations = validator
-		.validateProperty(entity, attribute);
-	if (constraintViolations.isEmpty()) {
-	    // valid
-	    return;
-	}
-	
-	// not valid
-	throw new DataValidationException("Invalid value for attribute: " + attribute 
-		+ " .Reason: " + constraintViolations.iterator().next().getMessage());
-	
+        Set<ConstraintViolation<Object>> constraintViolations = validator
+                .validateProperty(entity, attribute);
+        if (constraintViolations.isEmpty()) {
+            // valid
+            return;
+        }
+
+        // not valid
+        throw new DataValidationException("Invalid value for attribute: " + attribute
+                + " .Reason: " + constraintViolations.iterator().next().getMessage());
+
     }
 
     @Override
     public List<SchemaValidationError> validateSchema(EntitySchema entitySchema) {
-	List<Class<?>> dependenciesPath = new ArrayList<Class<?>>();
-	return validateSchema(entitySchema, entityClass, "", dependenciesPath);
+        List<Class<?>> dependenciesPath = new ArrayList<Class<?>>();
+        return validateSchema(entitySchema, entityClass, "", dependenciesPath);
     }
 
     private List<SchemaValidationError> validateSchema(EntitySchema entitySchema,
-	    Class<?> entityClassToParse, String fieldNamePrefix,
-	    List<Class<?>> dependenciesPath) {
+            Class<?> entityClassToParse, String fieldNamePrefix,
+            List<Class<?>> dependenciesPath) {
 
-	List<SchemaValidationError> errors = new ArrayList<SchemaValidationError>();
+        List<SchemaValidationError> errors = new ArrayList<SchemaValidationError>();
 
-	ReflectionSupport reflectionSupport = new ReflectionSupport();
-	List<Field> fields = reflectionSupport.getAllFields(entityClassToParse);
-	for (Field field : fields) {
-	    if (field.getAnnotation(Embedded.class) != null) {
-		if (field.getType().getAnnotation(Embeddable.class) != null) {
-		    // TODO move field naming to an strategy?
-		    String embeddedFieldamePrefix = fieldNamePrefix + field.getName()
-			    + ".";
-		    if (dependenciesPath.contains(field.getType())) {
-			errors.add(SchemaValidationError.buildRecursiveError(entityClass,
-				entityClassToParse, field.getName()));
-			continue;
-		    }
+        ReflectionSupport reflectionSupport = new ReflectionSupport();
+        List<Field> fields = reflectionSupport.getAllFields(entityClassToParse);
+        for (Field field : fields) {
+            if (field.getAnnotation(Embedded.class) != null) {
+                if (field.getType().getAnnotation(Embeddable.class) != null) {
+                    // TODO move field naming to an strategy?
+                    String embeddedFieldamePrefix = fieldNamePrefix + field.getName()
+                            + ".";
+                    if (dependenciesPath.contains(field.getType())) {
+                        errors.add(SchemaValidationError.buildRecursiveError(entityClass,
+                                entityClassToParse, field.getName()));
+                        continue;
+                    }
 
-		    List<Class<?>> embeddedDependenciesPath = new ArrayList<Class<?>>();
-		    embeddedDependenciesPath.addAll(dependenciesPath);
-		    embeddedDependenciesPath.add(field.getType());
+                    List<Class<?>> embeddedDependenciesPath = new ArrayList<Class<?>>();
+                    embeddedDependenciesPath.addAll(dependenciesPath);
+                    embeddedDependenciesPath.add(field.getType());
 
-		    List<SchemaValidationError> currentErrors = validateSchema(
-			    entitySchema, field.getType(), embeddedFieldamePrefix,
-			    embeddedDependenciesPath);
-		    if (currentErrors != null && !currentErrors.isEmpty()) {
-			errors.addAll(currentErrors);
-		    }
-		} else {
-		    throw new DataValidationException(
-			    "Error while mapping " + entityClass.getName() + " .Reason: "
-				    + field.getType().getName() + " is not embeddable");
-		}
-	    } else {
-		for (EntityToItemMappingStrategy mappingStrategy : mappingStrategies) {
-		    if (mappingStrategy.apply(field)) {
-			List<SchemaValidationError> currentErrors = mappingStrategy
-				.hasValidSchema(entitySchema, entityClass, field,
-					fieldNamePrefix);
-			if (currentErrors != null && !currentErrors.isEmpty()) {
-			    errors.addAll(currentErrors);
-			}
+                    List<SchemaValidationError> currentErrors = validateSchema(
+                            entitySchema, field.getType(), embeddedFieldamePrefix,
+                            embeddedDependenciesPath);
+                    if (currentErrors != null && !currentErrors.isEmpty()) {
+                        errors.addAll(currentErrors);
+                    }
+                } else {
+                    throw new DataValidationException(
+                            "Error while mapping " + entityClass.getName() + " .Reason: "
+                                    + field.getType().getName() + " is not embeddable");
+                }
+            } else {
+                for (EntityToItemMappingStrategy mappingStrategy : mappingStrategies) {
+                    if (mappingStrategy.apply(field)) {
+                        List<SchemaValidationError> currentErrors = mappingStrategy
+                                .hasValidSchema(entitySchema, entityClass, field,
+                                        fieldNamePrefix);
+                        if (currentErrors != null && !currentErrors.isEmpty()) {
+                            errors.addAll(currentErrors);
+                        }
 
-			break;
-		    }
-		}
-	    }
-	}
+                        break;
+                    }
+                }
+            }
+        }
 
-	return errors;
+        return errors;
     }
 
     @Override
     public List<AttributeDefinition> getMissingAttributesInEntityClass(
-	    EntitySchema entitySchema) {
-	List<EntityFieldAsAttribute> entityFieldsAsAttributes = getEntityFieldsAsAttributes(
-		entitySchema, entityClass, "");
+            EntitySchema entitySchema) {
+        List<EntityFieldAsAttribute> entityFieldsAsAttributes = getEntityFieldsAsAttributes(
+                entitySchema, entityClass, "");
 
-	List<AttributeDefinition> missingAttrDefs = new ArrayList<AttributeDefinition>();
+        List<AttributeDefinition> missingAttrDefs = new ArrayList<AttributeDefinition>();
 
-	Set<AttributeDefinition> attrDefs = entitySchema.getAttributes();
-	for (AttributeDefinition attributeDefinition : attrDefs) {
-	    boolean found = false;
-	    for (EntityFieldAsAttribute entityFieldAsAttr : entityFieldsAsAttributes) {
-		if (entityFieldAsAttr.getAttributeName()
-			.equals(attributeDefinition.getName())) {
-		    found = true;
-		    break;
-		}
-	    }
+        Set<AttributeDefinition> attrDefs = entitySchema.getAttributes();
+        for (AttributeDefinition attributeDefinition : attrDefs) {
+            boolean found = false;
+            for (EntityFieldAsAttribute entityFieldAsAttr : entityFieldsAsAttributes) {
+                if (entityFieldAsAttr.getAttributeName()
+                        .equals(attributeDefinition.getName())) {
+                    found = true;
+                    break;
+                }
+            }
 
-	    if (!found) {
-		missingAttrDefs.add(attributeDefinition);
-	    }
-	}
+            if (!found) {
+                missingAttrDefs.add(attributeDefinition);
+            }
+        }
 
-	return missingAttrDefs;
+        return missingAttrDefs;
     }
 
     private List<EntityFieldAsAttribute> getEntityFieldsAsAttributes(
-	    EntitySchema entitySchema, Class<?> entityClassToParse,
-	    String fieldNamePrefix) {
-	List<EntityFieldAsAttribute> entityFieldsAsAttributes = new ArrayList<EntityFieldAsAttribute>();
-	ReflectionSupport reflectionSupport = new ReflectionSupport();
-	List<Field> fields = reflectionSupport.getAllFields(entityClassToParse);
-	for (Field field : fields) {
-	    if (field.getAnnotation(Embedded.class) != null) {
-		if (field.getType().getAnnotation(Embeddable.class) != null) {
-		    String embeddedFieldamePrefix = fieldNamePrefix + field.getName()
-			    + ".";
-		    entityFieldsAsAttributes.addAll(getEntityFieldsAsAttributes(
-			    entitySchema, field.getType(), embeddedFieldamePrefix));
-		} else {
-		    throw new DataValidationException(
-			    "Error while parsing " + entityClass.getName() + " .Reason: "
-				    + field.getType().getName() + " is not embeddable");
+            EntitySchema entitySchema, Class<?> entityClassToParse,
+            String fieldNamePrefix) {
+        List<EntityFieldAsAttribute> entityFieldsAsAttributes = new ArrayList<EntityFieldAsAttribute>();
+        ReflectionSupport reflectionSupport = new ReflectionSupport();
+        List<Field> fields = reflectionSupport.getAllFields(entityClassToParse);
+        for (Field field : fields) {
+            if (field.getAnnotation(Embedded.class) != null) {
+                if (field.getType().getAnnotation(Embeddable.class) != null) {
+                    String embeddedFieldamePrefix = fieldNamePrefix + field.getName()
+                            + ".";
+                    entityFieldsAsAttributes.addAll(getEntityFieldsAsAttributes(
+                            entitySchema, field.getType(), embeddedFieldamePrefix));
+                } else {
+                    throw new DataValidationException(
+                            "Error while parsing " + entityClass.getName() + " .Reason: "
+                                    + field.getType().getName() + " is not embeddable");
 
-		}
-	    } else {
-		for (EntityToItemMappingStrategy mappingStrategy : mappingStrategies) {
-		    if (mappingStrategy.apply(field)) {
-			List<EntityFieldAsAttribute> fieldAsAttr = mappingStrategy
-				.getEntityFieldAsAttribute(field, fieldNamePrefix);
-			if (fieldAsAttr != null) {
-			    entityFieldsAsAttributes.addAll(fieldAsAttr);
-			}
+                }
+            } else {
+                for (EntityToItemMappingStrategy mappingStrategy : mappingStrategies) {
+                    if (mappingStrategy.apply(field)) {
+                        List<EntityFieldAsAttribute> fieldAsAttr = mappingStrategy
+                                .getEntityFieldAsAttribute(field, fieldNamePrefix);
+                        if (fieldAsAttr != null) {
+                            entityFieldsAsAttributes.addAll(fieldAsAttr);
+                        }
 
-			break;
-		    }
-		}
-	    }
-	}
+                        break;
+                    }
+                }
+            }
+        }
 
-	return entityFieldsAsAttributes;
+        return entityFieldsAsAttributes;
     }
 
     @Override
     public List<AttributeDefinition> getMissingFieldsInTable(EntitySchema entitySchema) {
-	return getMissingFieldsInTable(entitySchema, entityClass, "");
+        return getMissingFieldsInTable(entitySchema, entityClass, "");
     }
 
     private List<AttributeDefinition> getMissingFieldsInTable(EntitySchema entitySchema,
-	    Class<?> entityClassToParse, String fieldNamePrefix) {
-	List<AttributeDefinition> attrDefs = new ArrayList<AttributeDefinition>();
+            Class<?> entityClassToParse, String fieldNamePrefix) {
+        List<AttributeDefinition> attrDefs = new ArrayList<AttributeDefinition>();
 
-	ReflectionSupport reflectionSupport = new ReflectionSupport();
-	List<Field> fields = reflectionSupport.getAllFields(entityClassToParse);
-	for (Field field : fields) {
-	    if (field.getAnnotation(Embedded.class) != null) {
-		if (field.getType().getAnnotation(Embeddable.class) != null) {
-		    String embeddedFieldamePrefix = fieldNamePrefix + field.getName()
-			    + ".";
-		    List<AttributeDefinition> currentAttrDefs = getMissingFieldsInTable(
-			    entitySchema, field.getType(), embeddedFieldamePrefix);
-		    if (currentAttrDefs != null && !currentAttrDefs.isEmpty()) {
-			attrDefs.addAll(currentAttrDefs);
-		    }
-		} else {
-		    throw new DataValidationException(
-			    "Error while parsing " + entityClass.getName() + " .Reason: "
-				    + field.getType().getName() + " is not embeddable");
-		}
-	    } else {
-		for (EntityToItemMappingStrategy mappingStrategy : mappingStrategies) {
-		    if (mappingStrategy.apply(field)) {
-			List<AttributeDefinition> currentAttrDefs = mappingStrategy
-				.getSchemaUpdate(entitySchema, entityClass, field,
-					fieldNamePrefix);
-			if (currentAttrDefs != null && !currentAttrDefs.isEmpty()) {
-			    attrDefs.addAll(currentAttrDefs);
-			}
-			break;
-		    }
-		}
-	    }
-	}
+        ReflectionSupport reflectionSupport = new ReflectionSupport();
+        List<Field> fields = reflectionSupport.getAllFields(entityClassToParse);
+        for (Field field : fields) {
+            if (field.getAnnotation(Embedded.class) != null) {
+                if (field.getType().getAnnotation(Embeddable.class) != null) {
+                    String embeddedFieldamePrefix = fieldNamePrefix + field.getName()
+                            + ".";
+                    List<AttributeDefinition> currentAttrDefs = getMissingFieldsInTable(
+                            entitySchema, field.getType(), embeddedFieldamePrefix);
+                    if (currentAttrDefs != null && !currentAttrDefs.isEmpty()) {
+                        attrDefs.addAll(currentAttrDefs);
+                    }
+                } else {
+                    throw new DataValidationException(
+                            "Error while parsing " + entityClass.getName() + " .Reason: "
+                                    + field.getType().getName() + " is not embeddable");
+                }
+            } else {
+                for (EntityToItemMappingStrategy mappingStrategy : mappingStrategies) {
+                    if (mappingStrategy.apply(field)) {
+                        List<AttributeDefinition> currentAttrDefs = mappingStrategy
+                                .getSchemaUpdate(entitySchema, entityClass, field,
+                                        fieldNamePrefix);
+                        if (currentAttrDefs != null && !currentAttrDefs.isEmpty()) {
+                            attrDefs.addAll(currentAttrDefs);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
 
-	return attrDefs;
+        return attrDefs;
     }
 
 }

@@ -1,5 +1,7 @@
 package org.devspark.aws.lorm.test.model.embedded;
 
+import java.util.List;
+
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -13,6 +15,9 @@ public class SampleEntity {
     @Embedded
     private SampleEmbeddable embedded;
 
+    @Embedded
+    private List<SampleEmbeddable> embeddeds;
+    
     public String getSomeRandomField() {
 	return someRandomField;
     }
@@ -37,4 +42,12 @@ public class SampleEntity {
 	this.id = id;
     }
 
+    public void setEmbeddeds(List<SampleEmbeddable> embeddeds) {
+        this.embeddeds = embeddeds;
+    }
+    
+    public List<SampleEmbeddable> getEmbeddeds() {
+        return embeddeds;
+    }
+    
 }

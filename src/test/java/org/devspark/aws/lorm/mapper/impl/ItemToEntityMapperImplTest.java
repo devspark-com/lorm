@@ -84,6 +84,11 @@ public class ItemToEntityMapperImplTest {
 		"sampleentityid");
 	attributes.put(new AttributeDefinition("someRandomField", AttributeType.STRING, null),
 		"sample entity description");
+        attributes.put(new AttributeDefinition("embeddeds.0.someField", AttributeType.STRING, null),
+                "some field in list 0");
+        attributes.put(new AttributeDefinition("embeddeds.1.someField", AttributeType.STRING, null),
+                "some field in list 1");
+        
 	attributes.put(new AttributeDefinition("embedded.someField", AttributeType.STRING, null),
 		"some field 1");
 	attributes.put(new AttributeDefinition("embedded.deepEmbedded.someField",
