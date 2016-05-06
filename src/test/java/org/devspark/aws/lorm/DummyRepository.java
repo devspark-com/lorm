@@ -15,68 +15,75 @@ public class DummyRepository<T> implements Repository<T> {
     private final Class<T> entityClass;
 
     public DummyRepository(Class<T> entityClass) {
-	instances = new HashMap<String, T>();
-	this.entityClass = entityClass;
+        instances = new HashMap<String, T>();
+        this.entityClass = entityClass;
     }
 
     @Override
     public T findOne(String id) {
-	return instances.get(id);
+        return instances.get(id);
     }
 
     @Override
     public List<T> findAll() {
-	List<T> valuesAsList = new ArrayList<T>();
-	valuesAsList.addAll(instances.values());
-	return valuesAsList;
+        List<T> valuesAsList = new ArrayList<T>();
+        valuesAsList.addAll(instances.values());
+        return valuesAsList;
     }
 
     @Override
     public T save(T instance) {
-	EntityIdHandler idHandler = new EntityIdHandler(entityClass);
-	String id = idHandler.getIdValue(instance);
-	if (id == null) {
-	    String generatedId = idHandler.generateId(instance);
-	    if (generatedId == null) {
-		throw new DataValidationException("Entity id should not be null");
-	    }
-	    id = generatedId;
-	    idHandler.setIdValue(instance, generatedId);
-	}
+        EntityIdHandler idHandler = new EntityIdHandler(entityClass);
+        String id = idHandler.getIdValue(instance);
+        if (id == null) {
+            String generatedId = idHandler.generateId(instance);
+            if (generatedId == null) {
+                throw new DataValidationException("Entity id should not be null");
+            }
+            id = generatedId;
+            idHandler.setIdValue(instance, generatedId);
+        }
 
-	instances.put(id, instance);
+        instances.put(id, instance);
 
-	return instance;
+        return instance;
     }
 
     @Override
     public List<T> save(List<T> instances) {
-	for (T t : instances) {
-	    save(t);
-	}
+        for (T t : instances) {
+            save(t);
+        }
 
-	return instances;
+        return instances;
     }
 
     @Override
     public List<T> query(String attributeName, String value) {
         return null;
     }
-    
+
+    @Override
+    public List<T> query(String attributeName, String value, boolean ascendingOrder,
+            int maxResultSize) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     @Override
     public void deleteById(String id) {
-	instances.remove(id);
+        instances.remove(id);
     }
 
     @Override
     public void deleteById(List<String> ids) {
-	for (String id : ids) {
-	    deleteById(id);
-	}
+        for (String id : ids) {
+            deleteById(id);
+        }
     }
 
     @Override
     public Class<T> getEntityClass() {
-	return entityClass;
+        return entityClass;
     }
 }

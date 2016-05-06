@@ -11,6 +11,9 @@ public interface Repository<T> {
 
     List<T> query(String attributeName, String value);
 
+    List<T> query(String attributeName, String value, boolean ascendingOrder,
+            int maxResultSize);
+
     T save(T instance);
 
     List<T> save(List<T> instances);
