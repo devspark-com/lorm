@@ -40,7 +40,8 @@ public class EntityToItemMapperImplTest {
         Merchant merchant = new Merchant();
         merchant.setId("123456");
         merchant.setName("something");
-
+        merchant.setSite("");
+        
         Map<AttributeDefinition, Object> attrs = mapper.map(merchant);
 
         Assert.assertEquals("123456", attrs.get(buildAttrDefByName("id")));

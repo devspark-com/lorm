@@ -174,6 +174,10 @@ public class DefaultEntityToItemMappingStrategy implements EntityToItemMappingSt
             value = reflectionSupport.getValueOfField(field, entity);
         }
         
+        if (null != value && "".equals(value)) {
+            value = null;
+        }
+        
 	attributes.put(buildAttributeDefinition(field, fieldNamePrefix),
 		value);
     }
